@@ -16,12 +16,12 @@ menu = st.sidebar.radio(
     ]
 )
 
-# ---------------------- PAGE ACCUEIL ---------------------- #
+## ---------------------- PAGE ACCUEIL ---------------------- #
 if menu == "Accueil":
-    st.title("Bienvenue dans l'application d'orientation BTS SISR et SLAM")
+    st.title("Bienvenue dans l'application d'orientation BTS SIO")
     st.markdown("""
         ### Objectifs de cette application :
-        - Découvrir les métiers associés aux options SISR et SLAM.
+        - Découvrir les métiers associés aux options SISR(Réseau) et SLAM(développement).
         - Participer à un quiz pour identifier votre orientation idéale.
         - Jouer à un mini-jeu éducatif pour explorer les métiers.
         - Découvrir le **Lycée Simone Weil**, établissement proposant un BTS SIO de qualité.
@@ -160,29 +160,83 @@ elif menu == "Quiz d'Orientation":
             st.experimental_rerun()
 
 # ---------------------- PAGE JEU ÉDUCATIF ---------------------- #
-elif menu == "Jeu Éducatif : Développement vs Réseau":
-    st.title("Jeu Éducatif : Découvrez les Métiers")
-    st.markdown("""
-        Testez vos connaissances sur les métiers de **Développement** et de **Réseau**.
+import streamlit as st
 
-        **Question** : Que fait un administrateur réseau ?
-        """)
-    choix = st.radio("Vos options :", [
-        "Configure les serveurs et les réseaux.",
-        "Développe des applications web.",
-        "Crée des bases de données."])
+# Définir les questions et réponses
+questions = [
+    {
+        "question": "Que fait un développeur back-end ?",
+        "options": [
+            "Gère la partie visuelle des applications.",
+            "Travaille sur la logique et les bases de données côté serveur.",
+            "Surveille le trafic réseau et configure les routeurs."
+        ],
+        "answer": "Travaille sur la logique et les bases de données côté serveur.",
+        "emoji": "💻"
+    },
+    {
+        "question": "Quel est le rôle principal d'un ingénieur réseau ?",
+        "options": [
+            "Créer des interfaces utilisateur.",
+            "Maintenir et optimiser les infrastructures réseau.",
+            "Développer des systèmes de gestion de contenu."
+        ],
+        "answer": "Maintenir et optimiser les infrastructures réseau.",
+        "emoji": "🌐"
+    },
+    {
+        "question": "Quel langage est couramment utilisé pour créer des sites web front-end ?",
+        "options": [
+            "Python",
+            "JavaScript",
+            "SQL"
+        ],
+        "answer": "JavaScript",
+        "emoji": "🌟"
+    }
+]
 
-    if st.button("Valider votre réponse"):
-        if choix == "Configure les serveurs et les réseaux.":
-            st.success("Bravo ! C'est la bonne réponse.")
-        else:
-            st.error("Dommage, ce n'est pas correct. Réessayez !")
+# Initialisation de l'état
+if "question_index" not in st.session_state:
+    st.session_state.question_index = 0
+if "score" not in st.session_state:
+    st.session_state.score = 0
+
+# Récupérer la question actuelle
+current_question = questions[st.session_state.question_index]
+
+# Afficher la question actuelle
+st.title("🎮 Jeu Éducatif : Découvrez les Métiers 🖥️")
+st.markdown(f"### {current_question['emoji']} Question {st.session_state.question_index + 1} : {current_question['question']}")
+choix = st.radio("Vos options :", current_question["options"], key=f"q{st.session_state.question_index}")
+
+# Bouton pour valider la réponse
+if st.button("Valider votre réponse"):
+    if choix == current_question["answer"]:
+        st.success("Bravo ! C'est la bonne réponse. 🎉")
+        st.session_state.score += 1  # Incrémenter le score
+    else:
+        st.error(f"Dommage, la bonne réponse était : {current_question['answer']}. ❌")
+
+# Bouton pour passer à la question suivante
+if st.button("Suivant ➡️"):
+    if st.session_state.question_index < len(questions) - 1:
+        st.session_state.question_index += 1  # Passer à la question suivante
+        st.experimental_rerun()  # Recharger la page pour afficher la nouvelle question
+    else:
+        st.success("Vous avez terminé le quiz ! 🎉")
+        st.markdown(f"### Votre score final : {st.session_state.score} / {len(questions)}")
+
+# Affichage de la progression
+st.progress((st.session_state.question_index + 1) / len(questions))
+
+
 
 # ---------------------- PAGE PRÉSENTATION LYCÉE ---------------------- #
 elif menu == "Présentation : Lycée Simone Weil":
     st.title("Lycée Simone Weil : BTS SIO")
 
-    st.image("https://example.com/simone_weil.jpg", use_column_width=True)
+    st.image("lycée.jpg", caption="Image du lycée", use_container_width=True)
     st.markdown("""
         Le **Lycée Simone Weil**, situé au cœur de la région, est reconnu pour la qualité de son enseignement en informatique. 
         Le **BTS SIO (Services Informatiques aux Organisations)** proposé par cet établissement permet aux étudiants de se spécialiser en **SISR** ou **SLAM**.
